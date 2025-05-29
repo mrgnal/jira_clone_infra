@@ -1,0 +1,10 @@
+postgres_user: "{{ postgres_user }}"
+postgres_password: "{{ postgres_password }}"
+postgres_db: "{{ postgres_db }}"
+
+pg_host: 192.168.1.12
+pg_port: 5432
+
+app_hosts:
+  - 192.168.1.11
+  - 192.168.1.14

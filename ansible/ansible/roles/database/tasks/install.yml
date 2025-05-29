@@ -1,0 +1,8 @@
+- name: Install db packages
+  apt:
+    name:
+      - postgresql
+      - postgresql-client
+      - python3-psycopg2
+      - acl
+    state: latest

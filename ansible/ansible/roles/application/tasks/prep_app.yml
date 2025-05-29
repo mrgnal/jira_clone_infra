@@ -1,0 +1,34 @@
+- name: Create .env file
+  template:
+    src: .env.j2
+    dest: "{{ app_dir }}/.env"
+
+- name: Run npm install
+  community.general.npm:
+    path: "{{app_dir}}"
+
+- name: Install ts-node
+  community.general.npm:
+    path: "{{ app_dir }}"
+    name: ts-node
+    state: present
+
+- name: Install typescript
+  community.general.npm:
+    path: "{{ app_dir }}"
+    name: typescript
+    state: present
+
+- name: Pm2 installation
+  community.general.npm:
+    name: pm2
+    global: true
+
+- name: Configure pm2 to start at boot
+  command: pm2 startup systemd
+  register: pm2_startup_cmd
+  changed_when: "'[PM2] Init System found: systemd' in pm2_startup_cmd.stdout"
+
+- name: Execute pm2 startup command (as recommended by pm2)
+  command: "{{ pm2_startup_cmd.stdout_lines[-1] }}"
+  when: pm2_startup_cmd.stdout is search('sudo env PATH')

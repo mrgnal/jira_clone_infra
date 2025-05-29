@@ -1,0 +1,12 @@
+[Unit]
+Description=Upstash Local
+After=network.target
+
+[Service]
+ExecStart={{upstash_dir}}/upstash-redis-local --token {{ upstash_jwt }} --addr :{{ upstash_port }}
+Restart=always
+StandardOutput=append:/var/log/upstash-redis.log
+StandardError=append:/var/log/upstash-redis.err
+
+[Install]
+WantedBy=default.target

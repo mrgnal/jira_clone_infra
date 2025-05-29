@@ -1,0 +1,33 @@
+nodes = {
+  "jenkins_master"      => { ip: "192.168.1.21", ram: 2048,  cpus: 2, hostname: "jenkins-master.local" },
+  "jenkins_agent"      => { ip: "192.168.1.22", ram: 4096,  cpus: 2, hostname: "jenkins-agent.local" },
+}
+
+Vagrant.configure("2") do |config|
+  config.hostmanager.enabled = true
+  config.hostmanager.manage_host = true
+  config.vm.box = "Ringworld/UbuntuServer"
+
+  nodes.each do |name, opts|
+    config.vm.define name do |node|
+      node.vm.hostname = opts[:hostname]
+      node.vm.network "public_network", ip: opts[:ip]
+
+      node.vm.provider "virtualbox" do |vb|
+        vb.memory = opts[:ram]
+        vb.cpus = opts[:cpus]
+      end
+
+
+      if name == "jenkins_master"
+        node.vm.provision "file", source: ".env", destination:"/home/vagrant/.env", run: "always"
+        node.vm.provision "shell", path: "./scripts/master_setup.sh", run: "always"
+      end
+
+      if name == "jenkins_agent"
+        node.vm.provision "shell", path: "./scripts/agent_setup.sh", run: "always"
+      end
+
+    end
+  end
+end

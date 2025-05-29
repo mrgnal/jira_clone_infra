@@ -1,0 +1,24 @@
+- name: Ensure PostgreSQL is running
+  service:
+    name: postgresql
+    state: started
+    enabled: true
+
+#- name: Set PostgreSQL root user
+#  become_user: postgres
+#  community.postgresql.postgresql_user:
+#    name: postgres
+#    password:  "{{postgres_root_password}}"
+#    role_attr_flags: "SUPERUSER"
+
+- name: Set PostgreSQL user
+  become_user: postgres
+  community.postgresql.postgresql_user:
+    name: "{{ postgres_user }}"
+    password:  "{{postgres_password}}"
+
+- name: Set PostgreSQL database
+  become_user: postgres
+  community.postgresql.postgresql_db:
+    name: "{{ postgres_db }}"
+    owner: "{{ postgres_user }}"

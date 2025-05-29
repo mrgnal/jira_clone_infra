@@ -1,0 +1,12 @@
+- name:  Install Node.js and npm
+  apt:
+    name:
+     - nodejs
+     - npm
+    state: latest
+
+- name: Clone Git repository
+  ansible.builtin.git:
+    repo: "{{ git_url }}"
+    dest: "{{ app_dir }}"
+    force: yes

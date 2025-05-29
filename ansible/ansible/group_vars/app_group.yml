@@ -1,0 +1,7 @@
+# Clerk
+next_public_clerk_publishable_key: "{{ next_public_clerk_publishable_key }}"
+clerk_secret_key: "{{ clerk_secret_key }}"
+
+# Redis
+upstash_redis_rest_url: "192.168.1.15:{{upstash_port}}"
+upstash_redis_rest_token: "{{ upstash_redis_rest_token }}"

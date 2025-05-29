@@ -1,0 +1,3 @@
+nginx_conf_dest: /etc/nginx/nginx.conf
+
+app_port: 3000

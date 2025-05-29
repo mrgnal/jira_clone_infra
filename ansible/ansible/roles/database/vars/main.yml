@@ -1,0 +1,4 @@
+pg_version: 16
+max_connections: 100
+listen_addresses: '*'
+avalible_addresses: 0.0.0.0/0

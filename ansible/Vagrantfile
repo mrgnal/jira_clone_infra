@@ -1,0 +1,35 @@
+nodes = {
+  "app1"      => { ip: "192.168.1.11",  hostname: "app1.local" },
+  "db"        => { ip: "192.168.1.12",  hostname: "db.local" },
+  "nginx"     => { ip: "192.168.1.13",  hostname: "nginx.local" },
+  "app2"      => { ip: "192.168.1.14",  hostname: "app2.local" },
+  "redis"      => { ip: "192.168.1.15", hostname: "redis.local" }, 
+  "controller" => { ip: "192.168.1.10", hostname: "app-controller.local" },
+}
+
+Vagrant.configure("2") do |config|
+  config.hostmanager.enabled = true
+  config.hostmanager.manage_host = true
+  config.vm.box = "Ringworld/UbuntuServer"
+
+  nodes.each do |name, opts|
+    config.vm.define name do |node|
+      node.vm.hostname = opts[:hostname]
+      node.vm.network "public_network", ip: opts[:ip]
+
+      # node.vm.provider "virtualbox" do |vb|
+      #   vb.memory = opts[:ram]
+      #   vb.cpus = opts[:cpus]
+      # end
+
+      if name == "controller"
+        node.vm.synced_folder "./ansible", "/home/vagrant/ansible"
+
+        # ips = nodes.reject { |n, _| n == "controller" }.map { |_, v| v[:ip] }
+        # File.write("scripts/node_ips.txt", ips.join("\n"))
+
+        node.vm.provision "shell", path: "./scripts/bootstrap.sh"
+      end
+    end
+  end
+end

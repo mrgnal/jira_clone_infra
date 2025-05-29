@@ -1,0 +1,2 @@
+upstash_port: 8000
+upstash_jwt: "{{upstash_redis_rest_token}}"

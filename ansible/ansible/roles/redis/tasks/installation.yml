@@ -1,0 +1,24 @@
+- name: Install tools
+  apt:
+    name:
+      - redis-server
+    state: present
+  notify: Start redis
+
+- name: Creata upstash dir
+  file:
+    path: "{{ upstash_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Download upstash
+  get_url:
+    url: "{{ upstash_download_link }}"
+    dest: "{{upstash_dir}}/upstash.tar.gz"
+    mode: "0644"
+
+- name: Extract archive
+  unarchive:
+    src: "{{upstash_dir}}/upstash.tar.gz"
+    dest: "{{upstash_dir}}"
+    remote_src: true

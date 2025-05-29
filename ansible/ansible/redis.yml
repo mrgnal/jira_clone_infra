@@ -3,7 +3,7 @@
   become: true
   vars_files:
     - vault/redis.yml
-    - group_vars/redis_group.yml
+    - group_vars/redis.yml
   roles:
     - common
     - redis

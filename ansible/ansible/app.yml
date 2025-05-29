@@ -5,6 +5,7 @@
     - vault/db.yml
     - vault/app_group.yml
     - vault/redis.yml
+    - group_vars/redis.yml
   roles:
     - common
     - application

@@ -1,0 +1,9 @@
+- name: Set up redis
+  hosts: redis_hosts
+  become: true
+  vars_files:
+    - ../vault/redis_common.yml
+
+  roles:
+  - ../roles/common
+  - ../roles/redis

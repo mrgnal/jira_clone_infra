@@ -10,3 +10,11 @@
     repo: "{{ git_url }}"
     dest: "{{ app_dir }}"
     force: yes
+
+- name: Change ownership of app directory
+  file:
+    path: "{{ app_dir }}"
+    state: directory
+    recurse: yes
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_user }}"

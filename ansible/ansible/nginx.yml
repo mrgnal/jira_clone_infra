@@ -1,6 +1,0 @@
-- name: Set up nginx
-  hosts: nginx
-  become: true
-  roles:
-    - common
-    - nginx

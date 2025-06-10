@@ -1,9 +1,0 @@
-- name: Set up redis
-  hosts: redis
-  become: true
-  vars_files:
-    - vault/redis.yml
-    - group_vars/redis.yml
-  roles:
-    - common
-    - redis

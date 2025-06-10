@@ -1,0 +1,11 @@
+  pipelines:
+    metrics:
+      receivers: [hostmetrics]
+      processors: [batch, resource, resourcedetection]
+      exporters: [splunk_hec/metrics]
+    
+    logs:
+      receivers: [filelog]
+      processors: [batch, resourcedetection]
+      exporters: [splunk_hec/logs]
+    

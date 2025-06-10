@@ -1,0 +1,11 @@
+- name: Set up database
+  hosts: db_hosts
+  become: true
+  vars_files:
+    - ../vault/db_common.yml
+    - ../vault/db_hosts.yml
+    - ../inventory/host_vars/all.yml    
+
+  roles:
+    - ../roles/common
+    - ../roles/database

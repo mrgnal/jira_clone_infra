@@ -1,0 +1,13 @@
+- name: Start otel service
+  ansible.builtin.service:
+    name: splunk-otel-collector.service
+    state: restarted
+    enabled: true
+  
+- name: Gather service facts
+  ansible.builtin.service_facts:
+
+- name: Check if otel service is active
+  fail:
+    msg: "OpenTelemetry Collector is not running"
+  when: ansible_facts.services['splunk-otel-collector.service'].state != "running"

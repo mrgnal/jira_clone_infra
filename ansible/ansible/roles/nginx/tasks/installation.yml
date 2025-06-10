@@ -1,0 +1,48 @@
+- name: Install required pkg
+  apt:
+    name: 
+      - curl
+      - gnupg2
+      - ca-certificates
+      - lsb-release
+      - ubuntu-keyring
+    update_cache: yes
+
+- name: Download the nginx key
+  ansible.builtin.get_url:
+    url: https://nginx.org/keys/nginx_signing.key
+    dest: /usr/share/keyrings/nginx-archive-keyring.asc
+    mode: '0644'
+
+- name: Add nginx apt repository
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.asc] http://nginx.org/packages/mainline/ubuntu {{ ansible_distribution_release }} nginx"
+    filename: nginx    
+    state: present
+    update_cache: yes
+
+
+- name: Set APT pinning for nginx.org packages
+  ansible.builtin.copy:
+    dest: /etc/apt/preferences.d/99nginx
+    content: |
+      Package: *
+      Pin: origin nginx.org
+      Pin: release o=nginx
+      Pin-Priority: 900
+    mode: '0644'
+
+- name: Install nginx
+  apt:
+    name: 
+      - nginx
+      - nginx-module-otel
+    state: present
+
+- name: Deploy nginx config
+  template:
+    src: nginx.conf.j2
+    dest: "{{ nginx_conf_dest }}"
+    owner: root
+    group: root
+    mode: 0644

@@ -1,3 +1,0 @@
-upstash_port: 8000
-upstash_jwt: "{{upstash_redis_rest_token}}"
-upstash_redis_rest_url: "192.168.1.15:{{upstash_port}}"

@@ -1,0 +1,13 @@
+- name: Restart nginx
+  service:
+    name: nginx
+    state: restarted
+    enabled: true
+
+- name: Gather service facts
+  ansible.builtin.service_facts:
+
+- name: Check if nginx service is active
+  fail:
+    msg: "NGINX is not running"
+  when: ansible_facts.services['nginx.service'].state != "running"

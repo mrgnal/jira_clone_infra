@@ -1,0 +1,12 @@
+- name: Set up application
+  hosts: app_hosts
+  become: true
+  vars_files:
+    - ../vault/db_common.yml
+    - ../vault/app_hosts.yml
+    - ../vault/redis_common.yml
+    - ../inventory/host_vars/all.yml
+  
+  roles:
+  - ../roles/common
+  - ../roles/application

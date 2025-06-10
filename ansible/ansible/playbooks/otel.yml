@@ -1,0 +1,11 @@
+- name: Set up OpenTelemetry on hosts
+  hosts: otel_agents
+  become: true
+  vars_files:
+    - ../vault/otel.yml
+    - ../vault/db_common.yml
+
+
+  roles:
+    - ../roles/common
+    - ../roles/opentelemetry

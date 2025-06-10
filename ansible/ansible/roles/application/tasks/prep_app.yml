@@ -2,22 +2,27 @@
   template:
     src: .env.j2
     dest: "{{ app_dir }}/.env"
+  become: false
 
 - name: Run npm install
   community.general.npm:
     path: "{{app_dir}}"
+  become: false
+  
 
 - name: Install ts-node
   community.general.npm:
     path: "{{ app_dir }}"
     name: ts-node
     state: present
+  become: false
 
 - name: Install typescript
   community.general.npm:
     path: "{{ app_dir }}"
     name: typescript
     state: present
+  become: false
 
 - name: Pm2 installation
   community.general.npm:
@@ -28,7 +33,9 @@
   command: pm2 startup systemd
   register: pm2_startup_cmd
   changed_when: "'[PM2] Init System found: systemd' in pm2_startup_cmd.stdout"
+  become: false
+  failed_when: false
 
-- name: Execute pm2 startup command (as recommended by pm2)
+- name: Execute pm2 startup command 
   command: "{{ pm2_startup_cmd.stdout_lines[-1] }}"
   when: pm2_startup_cmd.stdout is search('sudo env PATH')

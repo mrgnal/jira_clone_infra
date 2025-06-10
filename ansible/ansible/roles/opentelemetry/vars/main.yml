@@ -1,0 +1,6 @@
+otel_dir: opentelemetry
+otel_download: https://github.com/signalfx/splunk-otel-collector/releases/download/v0.126.0/splunk-otel-collector_0.126.0_amd64.deb
+otel_pkg: splunk-otel-collector_0.126.0_amd64.deb
+
+otel_work_dir: /etc/otel/collector
+

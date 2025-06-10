@@ -1,0 +1,26 @@
+  splunk_hec/logs:
+    token: "${SPLUNK_HEC_TOKEN}"
+    endpoint: "${SPLUNK_HEC_URL}"
+    index: "{{ index }}_logs"
+    source: "otel"
+    sourcetype: "otel"
+    tls:
+      insecure_skip_verify: true
+
+splunk_hec/metrics:
+  token: "${SPLUNK_HEC_TOKEN}"
+  endpoint: "${SPLUNK_HEC_URL}"
+  index: "{{ index }}_metrics"
+  source: "otel"
+  sourcetype: "otel"
+  tls:
+      insecure_skip_verify: true
+
+splunk_hec/traces:
+  token: "${SPLUNK_HEC_TOKEN}"
+  endpoint: "${SPLUNK_HEC_URL}"
+  index: "{{ index }}_traces"
+  source: "otel"
+  sourcetype: "otel"
+  tls:
+      insecure_skip_verify: true

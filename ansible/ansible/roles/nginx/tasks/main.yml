@@ -1,13 +1,2 @@
-- name: Install nginx
-  apt:
-    name: nginx
-    state: latest
-
-- name: Deploy nginx config
-  template:
-    src: nginx.conf.j2
-    dest: "{{ nginx_conf_dest }}"
-    owner: root
-    group: root
-    mode: 0644
-  notify: Restart nginx
+- import_tasks: installation.yml
+- import_tasks: start.yml

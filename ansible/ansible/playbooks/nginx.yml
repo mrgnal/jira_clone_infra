@@ -1,0 +1,9 @@
+- name: Set up nginx
+  hosts: nginx_hosts
+  become: true
+  vars_files:
+    - ../inventory/host_vars/all.yml
+
+  roles:
+    - ../roles/common
+    - ../roles/nginx

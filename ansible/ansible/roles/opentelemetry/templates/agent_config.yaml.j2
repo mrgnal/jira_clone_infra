@@ -1,0 +1,44 @@
+receivers:
+  hostmetrics:
+    collection_interval: 10s
+    scrapers:
+      cpu:
+      load:
+      memory:
+      disk:
+      network:
+
+{% if otel_receivers_include is defined %}
+{{ lookup('template', otel_receivers_include) | indent(2) }}
+{% endif %}
+
+
+processors:
+  batch:
+  resource:
+    attributes:
+      - key: service.name
+        value: system-monitoring
+        action: insert
+
+  resourcedetection:
+    detectors:
+      - system
+    system:
+      hostname_sources:
+        - os 
+
+exporters:
+{% if otel_pipeline_include is defined %}
+{{ lookup('template', otel_exports_include) | indent(2) }}
+{% endif %}
+
+  # Debug
+  debug:
+    verbosity: detailed
+
+service:
+{% if otel_pipeline_include is defined %}
+{{ lookup('template', otel_pipeline_include) | indent(2) }}
+{% endif %}
+

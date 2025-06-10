@@ -1,0 +1,4 @@
+otel_receivers_include: "includes/db/receivers.yaml.j2"
+otel_pipeline_include: "includes/db/pipeline.yaml.j2"
+otel_exports_include: "includes/db/exports.yaml.j2"
+index: postgres

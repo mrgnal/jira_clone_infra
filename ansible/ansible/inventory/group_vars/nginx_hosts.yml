@@ -1,0 +1,4 @@
+otel_receivers_include: "includes/nginx/receivers.yaml.j2"
+otel_pipeline_include: "includes/nginx/pipeline.yaml.j2"
+otel_exports_include: "includes/nginx/exports.yaml.j2"
+index: nginx

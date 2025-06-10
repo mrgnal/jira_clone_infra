@@ -1,0 +1,4 @@
+otel_receivers_include: "includes/redis/receivers.yaml.j2"
+otel_pipeline_include: "includes/redis/pipeline.yaml.j2"
+otel_exports_include: "includes/redis/exports.yaml.j2"
+index: redis

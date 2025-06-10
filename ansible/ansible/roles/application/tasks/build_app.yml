@@ -2,19 +2,26 @@
   command: npx prisma migrate deploy
   args:
     chdir: "{{ app_dir }}"
+  become: false 
 
 - name: Run Prisma seed
   command: npx prisma db seed
   args:
     chdir: "{{ app_dir }}"
+  become: false
 
 - name: Build the application
   command: npm run build
   args:
     chdir: "{{ app_dir }}"
+  become: false
 
 - name: Start the application with PM2
   command: pm2 start npm --name jiraclone -- run start
   args:
     chdir: "{{ app_dir }}"
-  notify: Save PM2 process list
+  become_user: "{{ deploy_user }}"
+
+- name: Save PM2 process list
+  command: pm2 save
+  become_user: "{{ deploy_user }}"

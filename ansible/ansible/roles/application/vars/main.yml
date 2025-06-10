@@ -1,2 +1,4 @@
-app_dir: /opt/app
+app_dir: "/home/vagrant/app"
 git_url: https://github.com/mrgnal/jira_clone_deploy
+
+

@@ -1,2 +1,0 @@
-- name: Save PM2 process list
-  command: pm2 save

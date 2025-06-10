@@ -1,0 +1,4 @@
+otel_receivers_include: "includes/app/receivers.yaml.j2"
+otel_pipeline_include: "includes/app/pipeline.yaml.j2"
+otel_exports_include: "includes/app/exports.yaml.j2"
+index: app

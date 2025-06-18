@@ -8,7 +8,7 @@ x-app-base: &app-base
     UPSTASH_REDIS_REST_TOKEN: ${UPSTASH_REDIS_REST_TOKEN}
   depends_on:
     jira_db:
-      condition: service_healthy  
+      condition: service_healthy
     redis_proxy:
       condition: service_started
 
@@ -23,8 +23,8 @@ services:
       POSTGRES_DB: ${DATABASE_NAME}
     volumes:
       - jira_data:/var/lib/postgresql/data/
-    ports:
-      - '5432:5432'
+    # ports:
+    #   - '5432:5432'
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
       interval: 5s
@@ -51,27 +51,21 @@ services:
       UPSTASH_TOKEN: ${UPSTASH_REDIS_REST_TOKEN}
       SERVER_ADDRESS: ":8000"
       REDIS_ADDRESS: "redis:6379"
-    ports:
-      - '8001:8000'
     depends_on:
       - redis
       
   app1:
     <<: *app-base
-    ports:
-      - '3001:3000'
   
   app2:
     <<: *app-base
-    ports:
-      - '3002:3000'
 
   nginx:
     image: nginx:latest
     ports:
-      - '8080:80'
+      - '80:80'
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       - app1
       - app2

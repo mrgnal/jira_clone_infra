@@ -20,7 +20,8 @@ resource "aws_iam_policy" "ecr_access_policy" {
           "ecr:UploadLayerPart",
           "ecr:CompleteLayerUpload"
         ]
-        Resource = aws_ecr_repository.jira_repo.arn
+        # Resource = aws_ecr_repository.jira_repo.arn
+        Resource = "*"
       }
     ]
   })

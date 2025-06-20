@@ -1,3 +1,7 @@
 .vault_pass*
 .env
 .vagrant
+*tfvars
+backend-*.conf
+*.tfstate*
+.terraform*

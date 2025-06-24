@@ -1,3 +1,5 @@
+name: Jira dockerbb
+
 x-app-base: &app-base
   image: jira-clone:latest
   environment:
@@ -69,6 +71,26 @@ services:
     depends_on:
       - app1
       - app2
+  
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:latest
+    user: "0"
+    expose:
+      - "4317"
+      - "4318"
+    environment:
+      DB_ENDPOINT: db:5432
+      DB_USERNAME: ${DATABASE_USER}
+      DB_PASSWORD: ${DATABASE_PASSWORD}
+      DB_NAME: ${DATABASE_NAME}
+      REDIS_ENDPOINT: redis:6379
+      SPLUNK_HEC_TOKEN: ${SPLUNK_HEC_TOKEN}
+      SPLUNK_HEC_URL: ${SPLUNK_HEC_URL}
+
+    volumes:
+      - ./otel/otel-conf.yml:/etc/otel/config.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: ["--config", "/etc/otel/config.yml"]
 
 
   

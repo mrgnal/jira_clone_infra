@@ -1,4 +1,4 @@
-name: Jira dockerbb
+name: Jira docker
 
 x-app-base: &app-base
   image: jira-clone:latest
@@ -13,9 +13,12 @@ x-app-base: &app-base
       condition: service_healthy
     redis_proxy:
       condition: service_started
+  labels:
+    - "logging.enabled=true"
+    - "service.name=jira-app"
+    - "service.version=latest"
 
 services:
-
   jira_db:
     image: postgres:latest
     hostname: jira_db
@@ -25,28 +28,36 @@ services:
       POSTGRES_DB: ${DATABASE_NAME}
     volumes:
       - jira_data:/var/lib/postgresql/data/
-    # ports:
-    #   - '5432:5432'
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
       interval: 5s
       timeout: 2s
       retries: 20
+    labels:
+      - "logging.enabled=true"
+      - "service.name=postgres"
+      - "service.version=latest"
 
   migrate:
     image: jira-clone-migrate:latest
-    environment: 
+    environment:
       DATABASE_URL: postgresql://${DATABASE_USER}:${DATABASE_PASSWORD}@jira_db:5432/${DATABASE_NAME}
     depends_on:
       jira_db:
         condition: service_healthy
     restart: "no"
+    labels:
+      - "logging.enabled=false"  
 
   redis:
     image: redis:latest
     volumes:
       - redis_data:/data
-  
+    labels:
+      - "logging.enabled=true"
+      - "service.name=redis"
+      - "service.version=latest"
+
   redis_proxy:
     image: upstash-local:latest
     environment:
@@ -55,15 +66,29 @@ services:
       REDIS_ADDRESS: "redis:6379"
     depends_on:
       - redis
-      
+    labels:
+      - "logging.enabled=true"
+      - "service.name=redis-proxy"
+      - "service.version=latest"
+
   app1:
     <<: *app-base
-  
+    labels:
+      - "logging.enabled=true"
+      - "service.name=jira-app"
+      - "service.instance=app1"
+      - "service.version=latest"
+
   app2:
     <<: *app-base
+    labels:
+      - "logging.enabled=true"
+      - "service.name=jira-app"
+      - "service.instance=app2"
+      - "service.version=latest"
 
   nginx:
-    image: nginx:latest
+    image: nginx:alpine-otel
     ports:
       - '80:80'
     volumes:
@@ -71,7 +96,11 @@ services:
     depends_on:
       - app1
       - app2
-  
+    labels:
+      - "logging.enabled=true"
+      - "service.name=nginx"
+      - "service.version=latest"
+
   otel-collector:
     image: otel/opentelemetry-collector-contrib:latest
     user: "0"
@@ -79,21 +108,23 @@ services:
       - "4317"
       - "4318"
     environment:
-      DB_ENDPOINT: db:5432
+      DB_ENDPOINT: jira_db:5432
       DB_USERNAME: ${DATABASE_USER}
       DB_PASSWORD: ${DATABASE_PASSWORD}
       DB_NAME: ${DATABASE_NAME}
       REDIS_ENDPOINT: redis:6379
       SPLUNK_HEC_TOKEN: ${SPLUNK_HEC_TOKEN}
       SPLUNK_HEC_URL: ${SPLUNK_HEC_URL}
-
+    depends_on:
+      - nginx
     volumes:
       - ./otel/otel-conf.yml:/etc/otel/config.yml:ro
       - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
     command: ["--config", "/etc/otel/config.yml"]
+    labels:
+      - "logging.enabled=false"  
 
-
-  
 volumes:
   jira_data:
   redis_data:

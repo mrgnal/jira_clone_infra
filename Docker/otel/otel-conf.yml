@@ -1,6 +1,39 @@
 receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+  # filelog/docker_logs:
+  #   include:
+  #     - "/var/lib/docker/containers/*/*.log"
+  #   start_at: beginning
+  #   operators:
+  #     - type: json_parser
+  #       id: parser-docker
+  #       output: extract_metadata_from_filepath
+  #       timestamp:
+  #         parse_from: attributes.time
+  #         layout: '%Y-%m-%dT%H:%M:%S.%fZ'
+  #     - type: regex_parser
+  #       id: extract_metadata_from_filepath
+  #       regex: '^.*containers/(?P<container_id>[^/]+)/.*\.log$'
+  #       parse_from: attributes["log.file.path"]
+  #       output: add_container_metadata
+  #     - type: add
+  #       id: add_container_metadata
+  #       field: resource["container.id"]
+  #       value: EXPR(attributes.container_id)
+  #   include_file_path: true
+  #   include_file_name: true
+
   docker_stats:
     endpoint: unix:///var/run/docker.sock
+    excluded_images:
+      - "otel*"
+
     metrics:
       container.cpu.utilization:
         enabled: true
@@ -20,7 +53,7 @@ receivers:
         enabled: true
       container.blockio.io_service_bytes_recursive:
         enabled: true
-
+  
   postgresql:
     endpoint: "${DB_ENDPOINT}"
     username: "${DB_USERNAME}"
@@ -35,6 +68,8 @@ receivers:
   redis:
     endpoint: "${REDIS_ENDPOINT}"
     collection_interval: 10s
+  
+
 
 processors:
   batch:
@@ -52,6 +87,13 @@ processors:
     detectors: [env, docker]
     timeout: 2s
     override: false
+  filter/metrics:
+    metrics:
+      include:
+        match_type: regexp
+        resource_attributes:
+          - key: container.name
+            value: "^jiradocker.*"
 
 exporters:
   splunk_hec/metrics:
@@ -62,11 +104,63 @@ exporters:
     sourcetype: "otel"
     tls:
       insecure_skip_verify: true
-
-
+  
+  splunk_hec/logs:
+    token: "${SPLUNK_HEC_TOKEN}"
+    endpoint: "${SPLUNK_HEC_URL}"
+    index: docker_logs
+    source: "otel"
+    sourcetype: "otel"
+    tls:
+      insecure_skip_verify: true
+    
+  splunk_hec/traces:
+    token: "${SPLUNK_HEC_TOKEN}"
+    endpoint: "${SPLUNK_HEC_URL}"
+    index: docker_traces
+    source: "otel"
+    sourcetype: "otel"
+    tls:
+      insecure_skip_verify: true
+  
+  
 service:
   pipelines:
-    metrics:
-      receivers: [docker_stats, postgresql, redis]
-      processors: [resourcedetection/env, resourcedetection/system, resourcedetection/docker, batch]
+    metrics/global:
+      receivers: [docker_stats]
+      processors: 
+        - resourcedetection/env
+        - resourcedetection/system
+        - resourcedetection/docker
+        - filter/metrics
+        - batch
       exporters: [splunk_hec/metrics]
+    
+    metrics/db:
+      receivers: [postgresql, redis]
+      processors: 
+        - resourcedetection/env
+        - resourcedetection/system
+        - resourcedetection/docker
+        - batch
+      exporters: [splunk_hec/metrics]
+    
+    # logs:
+    #   receivers: [filelog/docker_logs]
+    #   processors:
+    #     - resourcedetection/env
+    #     - resourcedetection/system
+    #     - resourcedetection/docker
+    #     - batch
+    #   exporters: [splunk_hec/logs]
+  
+    traces:
+      receivers: [otlp]
+      processors:
+          - resourcedetection/env
+          - resourcedetection/system
+          - resourcedetection/docker
+          - batch
+      exporters: [splunk_hec/traces]
+
+    

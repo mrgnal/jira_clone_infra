@@ -6,28 +6,24 @@ receivers:
       http:
         endpoint: 0.0.0.0:4318
 
-  # filelog/docker_logs:
-  #   include:
-  #     - "/var/lib/docker/containers/*/*.log"
-  #   start_at: beginning
-  #   operators:
-  #     - type: json_parser
-  #       id: parser-docker
-  #       output: extract_metadata_from_filepath
-  #       timestamp:
-  #         parse_from: attributes.time
-  #         layout: '%Y-%m-%dT%H:%M:%S.%fZ'
-  #     - type: regex_parser
-  #       id: extract_metadata_from_filepath
-  #       regex: '^.*containers/(?P<container_id>[^/]+)/.*\.log$'
-  #       parse_from: attributes["log.file.path"]
-  #       output: add_container_metadata
-  #     - type: add
-  #       id: add_container_metadata
-  #       field: resource["container.id"]
-  #       value: EXPR(attributes.container_id)
-  #   include_file_path: true
-  #   include_file_name: true
+  filelog/docker_logs:
+    include:
+      - /var/lib/docker/containers/*/*.log
+    include_file_name: false
+    include_file_path: true
+    operators:
+    - type: json_parser
+      if: body matches "^{.*}$"
+      parse_to: attributes
+      output: parse_container_name
+    - id: recombine
+      type: recombine
+      combine_field: body
+      is_first_entry: body matches "^\\d{4}-\\d{2}-\\d{2}T\\d{2}"
+    - type: regex_parser
+      id: parse_container_name
+      regex: '(?P<container_name>.+)'
+      parse_from: attributes.attrs.tag
 
   docker_stats:
     endpoint: unix:///var/run/docker.sock
@@ -53,6 +49,10 @@ receivers:
         enabled: true
       container.blockio.io_service_bytes_recursive:
         enabled: true
+      container.uptime:
+        enabled: true
+      container.restarts:
+        enabled: true
   
   postgresql:
     endpoint: "${DB_ENDPOINT}"
@@ -63,13 +63,15 @@ receivers:
     tls:
       insecure: true
       insecure_skip_verify:
-        true  
+        true
 
   redis:
     endpoint: "${REDIS_ENDPOINT}"
     collection_interval: 10s
-  
 
+  nginx:
+     endpoint: "http://${NGINX_STATUS}/status"
+     collection_interval: 10s
 
 processors:
   batch:
@@ -94,6 +96,17 @@ processors:
         resource_attributes:
           - key: container.name
             value: "^jiradocker.*"
+  filter/logs:
+    logs:
+      include:
+        match_type: regexp
+        record_attributes:
+          - key: 	container_name
+            value: "^jiradocker.*"
+  filter/empty:
+    logs:
+      include:
+        match_type: regexp
 
 exporters:
   splunk_hec/metrics:
@@ -133,26 +146,30 @@ service:
         - resourcedetection/system
         - resourcedetection/docker
         - filter/metrics
+        - filter/empty
         - batch
       exporters: [splunk_hec/metrics]
     
-    metrics/db:
-      receivers: [postgresql, redis]
+    metrics/services:
+      receivers: [postgresql, redis, nginx]
       processors: 
         - resourcedetection/env
         - resourcedetection/system
         - resourcedetection/docker
+        - filter/empty
         - batch
       exporters: [splunk_hec/metrics]
     
-    # logs:
-    #   receivers: [filelog/docker_logs]
-    #   processors:
-    #     - resourcedetection/env
-    #     - resourcedetection/system
-    #     - resourcedetection/docker
-    #     - batch
-    #   exporters: [splunk_hec/logs]
+    logs:
+      receivers: [filelog/docker_logs]
+      processors:
+        - resourcedetection/env
+        - resourcedetection/system
+        - resourcedetection/docker
+        - filter/logs
+        - filter/empty
+        - batch
+      exporters: [splunk_hec/logs]
   
     traces:
       receivers: [otlp]
@@ -160,7 +177,6 @@ service:
           - resourcedetection/env
           - resourcedetection/system
           - resourcedetection/docker
+          - filter/empty
           - batch
       exporters: [splunk_hec/traces]
-
-    

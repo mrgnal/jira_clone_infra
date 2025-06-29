@@ -13,10 +13,10 @@ x-app-base: &app-base
       condition: service_healthy
     redis_proxy:
       condition: service_started
-  labels:
-    - "logging.enabled=true"
-    - "service.name=jira-app"
-    - "service.version=latest"
+  logging:
+    driver: "json-file"
+    options:
+      tag: "{{.Name}}/{{.ID}}"
 
 services:
   jira_db:
@@ -33,10 +33,10 @@ services:
       interval: 5s
       timeout: 2s
       retries: 20
-    labels:
-      - "logging.enabled=true"
-      - "service.name=postgres"
-      - "service.version=latest"
+    logging:
+      driver: "json-file"
+      options:
+        tag: "{{.Name}}/{{.ID}}"
 
   migrate:
     image: jira-clone-migrate:latest
@@ -46,17 +46,19 @@ services:
       jira_db:
         condition: service_healthy
     restart: "no"
-    labels:
-      - "logging.enabled=false"  
+    logging:
+      driver: "json-file"
+      options:
+        tag: "{{.Name}}/{{.ID}}"
 
   redis:
     image: redis:latest
     volumes:
       - redis_data:/data
-    labels:
-      - "logging.enabled=true"
-      - "service.name=redis"
-      - "service.version=latest"
+    logging:
+      driver: "json-file"
+      options:
+        tag: "{{.Name}}/{{.ID}}"
 
   redis_proxy:
     image: upstash-local:latest
@@ -66,10 +68,11 @@ services:
       REDIS_ADDRESS: "redis:6379"
     depends_on:
       - redis
-    labels:
-      - "logging.enabled=true"
-      - "service.name=redis-proxy"
-      - "service.version=latest"
+    logging:
+      driver: "json-file"
+      options:
+        tag: "{{.Name}}/{{.ID}}"
+    
 
   app1:
     <<: *app-base
@@ -89,17 +92,20 @@ services:
 
   nginx:
     image: nginx:alpine-otel
+    expose:
+      - 8080
     ports:
       - '80:80'
+      - '8080:8080'
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       - app1
       - app2
-    labels:
-      - "logging.enabled=true"
-      - "service.name=nginx"
-      - "service.version=latest"
+    logging:
+      driver: "json-file"
+      options:
+        tag: "{{.Name}}/{{.ID}}"
 
   otel-collector:
     image: otel/opentelemetry-collector-contrib:latest
@@ -115,15 +121,17 @@ services:
       REDIS_ENDPOINT: redis:6379
       SPLUNK_HEC_TOKEN: ${SPLUNK_HEC_TOKEN}
       SPLUNK_HEC_URL: ${SPLUNK_HEC_URL}
-    depends_on:
-      - nginx
+      NGINX_STATUS: nginx:8080
     volumes:
       - ./otel/otel-conf.yml:/etc/otel/config.yml:ro
       - /var/run/docker.sock:/var/run/docker.sock
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
     command: ["--config", "/etc/otel/config.yml"]
-    labels:
-      - "logging.enabled=false"  
+    logging:
+      driver: "json-file"
+      options:
+        tag: "{{.Name}}/{{.ID}}"
+
 
 volumes:
   jira_data:

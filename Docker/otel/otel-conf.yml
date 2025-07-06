@@ -28,10 +28,16 @@ receivers:
   docker_stats:
     endpoint: unix:///var/run/docker.sock
     excluded_images:
-      - "otel*"
+      - "jira-clone-migrate*"
 
     metrics:
       container.cpu.utilization:
+        enabled: true
+      container.cpu.usage.total:
+        enabled: true
+      container.cpu.usage.system:
+        enabled: true
+      container.cpu.usage.percpu:
         enabled: true
       container.memory.percent:
         enabled: true

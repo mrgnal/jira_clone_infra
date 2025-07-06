@@ -55,6 +55,7 @@ services:
     image: redis:latest
     volumes:
       - redis_data:/data
+    hostname: redis
     logging:
       driver: "json-file"
       options:
@@ -68,6 +69,7 @@ services:
       REDIS_ADDRESS: "redis:6379"
     depends_on:
       - redis
+    hostname: redis_proxy
     logging:
       driver: "json-file"
       options:
@@ -76,19 +78,13 @@ services:
 
   app1:
     <<: *app-base
-    labels:
-      - "logging.enabled=true"
-      - "service.name=jira-app"
-      - "service.instance=app1"
-      - "service.version=latest"
+    hostname: app1
+
 
   app2:
     <<: *app-base
-    labels:
-      - "logging.enabled=true"
-      - "service.name=jira-app"
-      - "service.instance=app2"
-      - "service.version=latest"
+    hostname: app2
+
 
   nginx:
     image: nginx:alpine-otel
@@ -106,6 +102,7 @@ services:
       driver: "json-file"
       options:
         tag: "{{.Name}}/{{.ID}}"
+    hostname: nginx
 
   otel-collector:
     image: otel/opentelemetry-collector-contrib:latest
@@ -131,8 +128,49 @@ services:
       driver: "json-file"
       options:
         tag: "{{.Name}}/{{.ID}}"
+    hostname: otel_collector
+    depends_on: 
+      - nginx
 
+
+  sonarqube:
+    image: sonarqube:latest
+    ports:
+      - "9000:9000"
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://sonarqube_db:5432/sonarqube
+      SONAR_JDBC_USERNAME: postgres
+      SONAR_JDBC_PASSWORD: sonar
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+    depends_on:
+      sonarqube_db:
+        condition: service_healthy
+
+  sonarqube_db:
+    image: postgres:latest
+    hostname: sonarqube_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: sonar
+      POSTGRES_DB: sonarqube
+    volumes:
+      - sonarqube_db:/var/lib/postgresql/data/
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 5s
+      timeout: 2s
+      retries: 20
+
+  
 
 volumes:
   jira_data:
   redis_data:
+
+  sonarqube_data:
+  sonarqube_logs:
+  sonarqube_extensions:
+  sonarqube_db:

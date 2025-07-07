@@ -1,0 +1,113 @@
+env:
+  contexts:
+  - name: Docker context
+    urls:
+    - http://nginx
+  parameters:
+    failOnError: true                 
+    failOnWarning: false               
+    progressToStdout: true 
+    
+jobs:
+- type: spider
+  parameters:
+    context: Docker context
+    maxDuration: 1
+    maxDepth: 3
+    parseSitemapXml: true
+    handleParameters: use_all
+    acceptCookies: true
+    threadCount: 3
+
+- type: passiveScan-wait
+  parameters:
+    maxDuration: 1
+
+- type: activeScan
+  parameters:
+    context: Docker context
+    
+  policyDefinition:
+    defaultStrength: Low
+    defaultThreshold: Off
+    rules:
+      # SQL Injection
+      - id: 40018
+        name: "SQL Injection"
+        threshold: Low
+        strength: High
+        
+      # Cross Site Scripting (XSS)
+      - id: 40012
+        name: "Cross Site Scripting (Reflected)"
+        threshold: Low
+        strength: High
+        
+      - id: 40014
+        name: "Cross Site Scripting (Persistent)"
+        threshold: Low
+        strength: High
+        
+      # Command Injection
+      - id: 90020
+        name: "Remote OS Command Injection"
+        threshold: Low
+        strength: High
+        
+      # Path Traversal
+      - id: 6
+        name: "Path Traversal"
+        threshold: Low
+        strength: Medium
+        
+      # Server Side Request Forgery (SSRF)
+      - id: 40009
+        name: "Server Side Request Forgery"
+        threshold: Low
+        strength: Medium
+        
+      # Directory Browsing
+      - id: 0
+        name: "Directory Browsing"
+        threshold: Low
+        strength: Medium
+        
+      # Buffer Overflow
+      - id: 30001
+        name: "Buffer Overflow"
+        threshold: Low
+        strength: Medium
+        
+      # Format String Error
+      - id: 30002
+        name: "Format String Error"
+        threshold: Low
+        strength: Medium
+        
+      # XML External Entity (XXE)
+      - id: 90019
+        name: "XML External Entity Attack"
+        threshold: Low
+        strength: Medium
+        
+
+- type: report
+  parameters:
+    template: traditional-pdf
+    theme: null
+    reportDir: /tmp/zap/
+    reportTitle: Scanning Report
+  risks:
+  - low
+  - medium
+  - high
+  confidences:
+  - low
+  - medium
+  - high
+  - confirmed
+  sections:
+  - instancecount
+  - alertdetails
+  - alertcount
+

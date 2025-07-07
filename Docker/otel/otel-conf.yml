@@ -28,6 +28,7 @@ receivers:
   docker_stats:
     endpoint: unix:///var/run/docker.sock
     excluded_images:
+      - "ghcr.io/zaproxy/zaproxy:stable"
       - "jira-clone-migrate*"
 
     metrics:

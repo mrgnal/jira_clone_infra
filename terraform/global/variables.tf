@@ -1,14 +1,17 @@
 variable "region" {
     description = "AWS region"
     type = string
-    default = "eu-north-1"
+    default = "us-east-1"
 }
 
 variable "backend_bucket_name" {
   type = string
 }
 
-variable "ecr_repo" {
+variable "ecr_app_name" {
   type = string
 }
 
+variable "ecr_migrate_name" {
+  type = string
+}

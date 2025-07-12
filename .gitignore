@@ -2,7 +2,7 @@
 .env
 .vagrant
 *tfvars
-backend-*.conf
+backend*.conf
 *.tfstate*
 .terraform*
 zap_report

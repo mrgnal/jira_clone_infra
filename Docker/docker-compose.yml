@@ -1,7 +1,7 @@
 name: Jira docker
 
 x-app-base: &app-base
-  image: jira-clone:latest
+  image: 470276446618.dkr.ecr.eu-north-1.amazonaws.com/jira_clone:latest
   environment:
     DATABASE_URL: postgresql://${DATABASE_USER}:${DATABASE_PASSWORD}@jira_db:5432/${DATABASE_NAME}
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}

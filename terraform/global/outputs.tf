@@ -7,6 +7,10 @@ output "jenkins_secret_access_key" {
   sensitive = true
 }
 
-output "ecr_url" {
-  value = aws_ecr_repository.jira_repo.repository_url
+output "ecr_app_url" {
+  value       = module.app_ecr.repository_url
+}
+
+output "ecr_migrate_url" {
+  value       = module.migrate_ecr.repository_url
 }

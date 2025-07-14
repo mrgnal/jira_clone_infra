@@ -1,7 +1,7 @@
 resource "aws_alb" "this" {
     name = var.alb_name
-    security_groups = [for sg in var.security_groups_ids : sg]
-    subnets = [for subnet in var.subnets_ids : subnet]
+    security_groups = var.security_groups_ids
+    subnets = var.subnets_ids
     enable_deletion_protection = false
 }
 

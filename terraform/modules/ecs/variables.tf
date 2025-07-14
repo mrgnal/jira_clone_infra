@@ -1,3 +1,4 @@
+#ECS cluster
 variable "cluster_name" {
     type = string
 }
@@ -11,9 +12,9 @@ variable "service_name" {
   type = string
 }
 
-variable "task_definition" {
-  type = string
-}
+# variable "task_definition" {
+#   type = string
+# }
 
 variable "desired_count" {
   type = number
@@ -54,4 +55,48 @@ variable "subnets_ids" {
 
 variable "security_groups" {
   type = list(string)
+}
+
+#Task defenition
+variable "family_name" {
+  type = string
+}
+
+variable "network_mode" {
+  type = string
+  default = "awsvpc"
+}
+
+# variable "execution_role_arn" {
+#   type = string
+# }
+
+variable "cpu" {
+  type = string
+  default = "512"
+}
+
+variable "memory" {
+  type = string
+  default = "1024"
+}
+
+variable "family_name" {
+  type = string
+}
+
+variable "container_definitions" {
+  type = string
+}
+
+#IAM role
+variable "role_name" {
+  type = string
+}
+
+variable "policies" {
+  type = list(object({
+    name = string
+    policy = string
+  }))
 }

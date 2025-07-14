@@ -1,6 +1,6 @@
 resource "aws_db_subnet_group" "this" {
     name = "rds-subnet-group"
-    subnet_ids = [for subnet in var.subnet_ids : subnet.id]
+    subnet_ids = var.subnet_ids
 }
 
 resource "aws_db_instance" "this" {
@@ -14,7 +14,7 @@ resource "aws_db_instance" "this" {
     skip_final_snapshot = var.skip_final_snapshot
     multi_az = var.multi_az
     storage_encrypted = var.storage_encrypted
-    vpc_security_group_ids = [for sg in var.rds_sg : sg.id]
+    vpc_security_group_ids = var.rds_sg
 
     db_name = var.db_name
     username = var.db_username

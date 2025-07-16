@@ -13,7 +13,7 @@ resource "aws_subnet" "private" {
 }
 
 resource "aws_subnet" "public" {
-  for_each = var.pulic_subnets
+  for_each = var.public_subnets
 
   vpc_id = aws_vpc.this.id
   cidr_block = each.value.cidr

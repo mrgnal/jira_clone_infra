@@ -1,4 +1,4 @@
-#ECS cluster
+ #ECS cluster
 variable "cluster_name" {
     type = string
 }
@@ -11,10 +11,6 @@ variable "container_metric" {
 variable "service_name" {
   type = string
 }
-
-# variable "task_definition" {
-#   type = string
-# }
 
 variable "desired_count" {
   type = number
@@ -31,13 +27,8 @@ variable "force_new_deployment" {
   default = true
 }
 
-variable "target_group_arn" {
-  type = string
-}
-
-variable "container_port" {
+variable "port" {
   type = number
-  default =3000
 }
 
 variable "container_name" {
@@ -49,11 +40,11 @@ variable "assign_public_ip" {
   default = false
 }
 
-variable "subnets_ids" {
+variable "ecs_subnets" {
   type = list(string)
 }
 
-variable "security_groups" {
+variable "ecs_sg" {
   type = list(string)
 }
 
@@ -67,10 +58,6 @@ variable "network_mode" {
   default = "awsvpc"
 }
 
-# variable "execution_role_arn" {
-#   type = string
-# }
-
 variable "cpu" {
   type = string
   default = "512"
@@ -79,10 +66,6 @@ variable "cpu" {
 variable "memory" {
   type = string
   default = "1024"
-}
-
-variable "family_name" {
-  type = string
 }
 
 variable "container_definitions" {
@@ -99,4 +82,55 @@ variable "policies" {
     name = string
     policy = string
   }))
+}
+
+#ALB
+variable "alb_name" {
+  type = string
+}
+
+variable "alb_sg" {
+  type = list(string)
+}
+
+variable "alb_subnets" {
+  type = list(string)
+}
+
+variable "listener_port" {
+  type = string
+  default = "80"
+}
+
+variable "listener_rotocol" {
+  type = string
+  default = "HTTP"
+}
+
+variable "tg_name" {
+  type = string
+  default = "ecs-tg"
+}
+
+variable "vpc_id" {
+  type = string
+}
+
+variable "tg_rotocol" {
+  type = string
+  default = "HTTP"
+}
+
+variable "target_type" {
+  type = string
+  default = "ip"
+}
+
+variable "region" {
+  type = string
+}
+
+#NAT
+variable "private_rt" {
+  type = string
 }

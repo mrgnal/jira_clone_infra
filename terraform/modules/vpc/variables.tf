@@ -9,7 +9,7 @@ variable "tags" {
     }
 }
 
-variable "pulic_subnets" {
+variable "public_subnets" {
     type = map(object({
     cidr = string
     az   = string
@@ -21,13 +21,4 @@ variable "private_subnets" {
     cidr = string
     az   = string
     }))
-}
-
-variable "region" {
-    type = string
-    default = "us-east-1"
-}
-
-variable "endpoint_sg_id" {
-  type = string
 }

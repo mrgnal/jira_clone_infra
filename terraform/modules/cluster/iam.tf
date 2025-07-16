@@ -25,6 +25,13 @@ resource "aws_iam_policy" "this" {
 resource "aws_iam_role_policy_attachment" "this" {
     for_each = aws_iam_policy.this
     
-    role = aws_iam_role.this.arn
+    role = aws_iam_role.this.name
     policy_arn = each.value.arn
+}
+
+
+resource "aws_iam_policy_attachment" "ecs_task_execution_role_policy" {
+  name = "ecs-execution-attachment"
+  roles      = [aws_iam_role.this.name]
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }

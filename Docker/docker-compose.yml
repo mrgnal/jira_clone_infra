@@ -1,7 +1,7 @@
 name: Jira docker
 
 x-app-base: &app-base
-  image: 470276446618.dkr.ecr.eu-north-1.amazonaws.com/jira_clone:latest
+  image: jira-clone:latest
   environment:
     DATABASE_URL: postgresql://${DATABASE_USER}:${DATABASE_PASSWORD}@jira_db:5432/${DATABASE_NAME}
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
@@ -38,18 +38,18 @@ services:
       options:
         tag: "{{.Name}}/{{.ID}}"
 
-  migrate:
-    image: jira-clone-migrate:latest
-    environment:
-      DATABASE_URL: postgresql://${DATABASE_USER}:${DATABASE_PASSWORD}@jira_db:5432/${DATABASE_NAME}
-    depends_on:
-      jira_db:
-        condition: service_healthy
-    restart: "no"
-    logging:
-      driver: "json-file"
-      options:
-        tag: "{{.Name}}/{{.ID}}"
+  # migrate:
+  #   image: jira-clone-migrate:latest
+  #   environment:
+  #     DATABASE_URL: postgresql://${DATABASE_USER}:${DATABASE_PASSWORD}@jira_db:5432/${DATABASE_NAME}
+  #   depends_on:
+  #     jira_db:
+  #       condition: service_healthy
+  #   restart: "no"
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       tag: "{{.Name}}/{{.ID}}"
 
   redis:
     image: redis:latest
@@ -129,17 +129,17 @@ services:
     depends_on: 
       - nginx
 
-  zaproxy:
-    image: ghcr.io/zaproxy/zaproxy:stable
-    hostname: zaproxy
-    ports:
-      - "8090:8090"
-    volumes:
-      - ./zap/zap_config.yaml:/zap/wrk/zap_config.yaml
-      - ./zap/zap_report/:/tmp/zap/
-    command: zap.sh -daemon -host 0.0.0.0 -port 8090 -config api.addrs.addr.name=.* -config api.addrs.addr.regex=true -autorun /zap/wrk/zap_config.yaml
-    depends_on:
-      - nginx
+  # zaproxy:
+  #   image: ghcr.io/zaproxy/zaproxy:stable
+  #   hostname: zaproxy
+  #   ports:
+  #     - "8090:8090"
+  #   volumes:
+  #     - ./zap/zap_config.yaml:/zap/wrk/zap_config.yaml
+  #     - ./zap/zap_report/:/tmp/zap/
+  #   command: zap.sh -daemon -host 0.0.0.0 -port 8090 -config api.addrs.addr.name=.* -config api.addrs.addr.regex=true -autorun /zap/wrk/zap_config.yaml
+  #   depends_on:
+  #     - nginx
   
 volumes:
   jira_data:

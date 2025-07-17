@@ -134,3 +134,29 @@ variable "region" {
 variable "private_rt" {
   type = string
 }
+
+#Autoscale
+variable "max_capacity" {
+  type = number
+  default = 4
+}
+
+variable "min_capacity" {
+  type = number
+  default = 1
+}
+
+variable "autoscale_policy_name" {
+  type = string
+  default = "ecs-policy-cpu"
+}
+
+variable "target_value" {
+  type = number
+  default = 50.0
+}
+
+variable "scale_cooldown" {
+  type = number
+  default = 60
+}

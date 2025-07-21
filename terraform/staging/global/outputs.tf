@@ -6,3 +6,7 @@ output "ssm_db" {
 output "network" {
   value = module.network
 }
+
+output "dns" {
+  value = module.dns
+}

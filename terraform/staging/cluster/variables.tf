@@ -37,3 +37,7 @@ variable "upstash_token" {
 variable "container_name" {
   type = string
 }
+
+variable "domain_name" {
+  type = string
+}

@@ -14,9 +14,9 @@ variable "db_password" {
   type = string
 }
 
-variable "rds_sg" {
-  type = list(string)
-}
+# variable "rds_sg" {
+#   type = list(string)
+# }
 
 variable "storage_encrypted" {
   type = bool
@@ -60,4 +60,12 @@ variable "allocated_storage" {
 
 variable "identifier" {
   type = string
+}
+
+variable "vpc_id" {
+  type = string
+}
+
+variable "subnets_cidr" {
+  type = list(string)
 }

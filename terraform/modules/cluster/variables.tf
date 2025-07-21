@@ -44,9 +44,9 @@ variable "ecs_subnets" {
   type = list(string)
 }
 
-variable "ecs_sg" {
-  type = list(string)
-}
+# variable "ecs_sg" {
+#   type = list(string)
+# }
 
 #Task defenition
 variable "family_name" {
@@ -89,9 +89,9 @@ variable "alb_name" {
   type = string
 }
 
-variable "alb_sg" {
-  type = list(string)
-}
+# variable "alb_sg" {
+#   type = list(string)
+# }
 
 variable "alb_subnets" {
   type = list(string)
@@ -159,4 +159,22 @@ variable "target_value" {
 variable "scale_cooldown" {
   type = number
   default = 60
+}
+
+#SSL
+variable "enable_ssl" {
+  type = bool
+  default = false
+}
+
+variable "certificate_arn" {
+  type = string
+}
+
+variable "zone_id" {
+  type = string
+}
+
+variable "domain_name" {
+  type = string
 }

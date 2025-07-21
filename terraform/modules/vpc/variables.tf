@@ -22,3 +22,8 @@ variable "private_subnets" {
     az   = string
     }))
 }
+
+variable "enable_ssl" {
+  type        = bool
+  default     = false
+}

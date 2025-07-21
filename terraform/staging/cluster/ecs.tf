@@ -9,7 +9,7 @@ module "app" {
   region = var.region
   #ALB
   alb_name = "jira-alb"
-  alb_sg  = [data.terraform_remote_state.staging_global.outputs.network.alb_sg_id]
+  # alb_sg  = [data.terraform_remote_state.staging_global.outputs.network.alb_sg_id]
   alb_subnets = data.terraform_remote_state.staging_global.outputs.network.public_subnets_ids
   vpc_id = data.terraform_remote_state.staging_global.outputs.network.vpc_id
   
@@ -19,7 +19,7 @@ module "app" {
   #Service
   service_name     = "jira-service"
   ecs_subnets =  data.terraform_remote_state.staging_global.outputs.network.private_subnets_ids
-  ecs_sg  = [data.terraform_remote_state.staging_global.outputs.network.ecs_sg_id]
+  # ecs_sg  = [data.terraform_remote_state.staging_global.outputs.network.ecs_sg_id]
   container_name   = "jira"
   port = 3000
   
@@ -134,4 +134,11 @@ module "app" {
 
   #NAT
   private_rt = data.terraform_remote_state.staging_global.outputs.network.private_rt
+
+  # DNS
+  enable_ssl = true
+  certificate_arn = data.terraform_remote_state.staging_global.outputs.dns.certificate_arn
+  zone_id = data.terraform_remote_state.staging_global.outputs.dns.zone_id
+  domain_name = var.domain_name
+
 }

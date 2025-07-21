@@ -6,17 +6,21 @@ output "private_subnets_ids" {
   value = [for subnet in aws_subnet.private : subnet.id]
 }
 
-output "alb_sg_id" {
-  value = aws_security_group.alb.id
+output "private_subnets_cidr" {
+  value = [for subnet in aws_subnet.private : subnet.cidr_block]
 }
 
-output "ecs_sg_id" {
-  value = aws_security_group.ecs.id
-}
+# output "alb_sg_id" {
+#   value = aws_security_group.alb.id
+# }
 
-output "rds_sg_id" {
-  value = aws_security_group.rds.id
-}
+# output "ecs_sg_id" {
+#   value = aws_security_group.ecs.id
+# }
+
+# output "rds_sg_id" {
+#   value = aws_security_group.rds.id
+# }
 
 # output "endpoint_sg_id" {
 #   value = aws_security_group.endpoint.id

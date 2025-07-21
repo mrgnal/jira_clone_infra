@@ -8,11 +8,13 @@ module "database" {
 
   identifier = "jira-database"
   subnet_ids = module.network.private_subnets_ids
-  rds_sg     = [module.network.rds_sg_id]
 
   db_name     = var.db_name
   db_username = var.db_username
   db_password = random_password.password_generator.result
+
+  subnets_cidr = module.network.private_subnets_cidr
+  vpc_id = module.network.vpc_id
 }
 
 resource "aws_ssm_parameter" "db_url" {

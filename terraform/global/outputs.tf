@@ -22,3 +22,7 @@ output "ecr_app_arn" {
 output "ecr_migrate_arn" {
   value = module.migrate_ecr.repository_arn
 }
+
+output "network" {
+  value = module.network
+}

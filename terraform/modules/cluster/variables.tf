@@ -178,3 +178,8 @@ variable "zone_id" {
 variable "domain_name" {
   type = string
 }
+
+variable "health_matcher" {
+  type = string
+  default = "200-399" 
+}

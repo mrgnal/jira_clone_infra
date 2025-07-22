@@ -53,8 +53,8 @@ module "app" {
         { name = "DATABASE_URL",        valueFrom = data.terraform_remote_state.staging_global.outputs.ssm_db },
         { name = "CLERK_PUBLISHABLE",   valueFrom = aws_ssm_parameter.clerk_public.arn },
         { name = "CLERK_SECRET",        valueFrom = aws_ssm_parameter.clerk_private.arn },
-        { name = "UPSTASH_REDIS_URL",   valueFrom = aws_ssm_parameter.upstash_url.arn },
-        { name = "UPSTASH_REDIS_TOKEN", valueFrom = aws_ssm_parameter.upstash_token.arn }
+        { name = "UPSTASH_REDIS_REST_URL",   valueFrom = aws_ssm_parameter.upstash_url.arn },
+        { name = "UPSTASH_REDIS_REST_TOKEN", valueFrom = aws_ssm_parameter.upstash_token.arn }
       ]
     }
   ])

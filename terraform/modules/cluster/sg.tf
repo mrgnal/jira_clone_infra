@@ -18,7 +18,6 @@ resource "aws_security_group" "alb" {
   }
 }
 
-
 #ECS 
 resource "aws_security_group" "ecs" {
   vpc_id = var.vpc_id

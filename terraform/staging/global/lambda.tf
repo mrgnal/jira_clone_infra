@@ -4,10 +4,10 @@ module "migrations" {
   name = "jira-migrations"
   image_uri ="${data.terraform_remote_state.global.outputs.ecr_migrate_url}:latest"
 
-  vpc_id = module.network.vpc_id
-  subnets_cidr = module.network.private_subnets_cidr
-  subnet_ids = module.network.private_subnets_ids
-  # security_group_ids = [module.network.ecs_sg_id]
+  vpc_id = data.terraform_remote_state.global.outputs.network.vpc_id
+  subnets_cidr = data.terraform_remote_state.global.outputs.network.private_subnets_cidr
+  subnet_ids = data.terraform_remote_state.global.outputs.network.private_subnets_ids
+  # security_group_ids = [data.terraform_remote_state.global.outputs.network.ecs_sg_id]
 
   db_url = aws_ssm_parameter.db_url.value
   

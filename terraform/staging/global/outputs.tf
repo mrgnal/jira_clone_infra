@@ -3,10 +3,7 @@ output "ssm_db" {
   sensitive = true
 }
 
-output "network" {
-  value = module.network
-}
-
 output "dns" {
   value = module.dns
 }
+

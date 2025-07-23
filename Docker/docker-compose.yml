@@ -38,18 +38,18 @@ services:
       options:
         tag: "{{.Name}}/{{.ID}}"
 
-  # migrate:
-  #   image: jira-clone-migrate:latest
-  #   environment:
-  #     DATABASE_URL: postgresql://${DATABASE_USER}:${DATABASE_PASSWORD}@jira_db:5432/${DATABASE_NAME}
-  #   depends_on:
-  #     jira_db:
-  #       condition: service_healthy
-  #   restart: "no"
-  #   logging:
-  #     driver: "json-file"
-  #     options:
-  #       tag: "{{.Name}}/{{.ID}}"
+  migrate:
+    image: jira-clone-migrate:latest
+    environment:
+      DATABASE_URL: postgresql://${DATABASE_USER}:${DATABASE_PASSWORD}@jira_db:5432/${DATABASE_NAME}
+    depends_on:
+      jira_db:
+        condition: service_healthy
+    restart: "no"
+    logging:
+      driver: "json-file"
+      options:
+        tag: "{{.Name}}/{{.ID}}"
 
   redis:
     image: redis:latest

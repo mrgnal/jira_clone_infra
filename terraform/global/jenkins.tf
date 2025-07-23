@@ -6,10 +6,10 @@ resource "aws_instance" "jenkins" {
   key_name = aws_key_pair.jenkins_key.key_name
   subnet_id = module.network.public_subnets_ids[0]
   vpc_security_group_ids = [aws_security_group.jenkins_sg.id]
-  associate_public_ip_address = true
+  iam_instance_profile = aws_iam_instance_profile.jenkins_master.name
 
   root_block_device {
-    volume_size = 15
+    volume_size = 20
   }
 
   user_data = file("./jenkins-files/jenkins_init.sh")
@@ -17,6 +17,11 @@ resource "aws_instance" "jenkins" {
   tags = {
     Name = "jenkins"
   }
+}
+
+#IP
+resource "aws_eip" "jenkins_ip" {
+  instance = aws_instance.jenkins.id
 }
 
 #SSH key generation
@@ -62,6 +67,69 @@ resource "aws_security_group" "jenkins_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+
+resource "aws_iam_role" "jenkins_master" {
+  name = "jenkins-master-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect = "Allow",
+      Principal = {
+        Service = "ec2.amazonaws.com"
+      },
+      Action = "sts:AssumeRole"
+    }]
+  })
+}
+
+resource "aws_iam_policy" "jenkins_master_policy" {
+  name        = "jenkins-master-policy"
+
+  policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "ec2:DescribeSpotInstanceRequests",
+                "ec2:CancelSpotInstanceRequests",
+                "ec2:GetConsoleOutput",
+                "ec2:RequestSpotInstances",
+                "ec2:RunInstances",
+                "ec2:StartInstances",
+                "ec2:StopInstances",
+                "ec2:TerminateInstances",
+                "ec2:CreateTags",
+                "ec2:DeleteTags",
+                "ec2:DescribeInstances",
+                "ec2:DescribeInstanceTypes",
+                "ec2:DescribeKeyPairs",
+                "ec2:DescribeRegions",
+                "ec2:DescribeImages",
+                "ec2:DescribeAvailabilityZones",
+                "ec2:DescribeSecurityGroups",
+                "ec2:DescribeSubnets",
+                "iam:ListInstanceProfilesForRole",
+                "iam:PassRole",
+                "ec2:GetPasswordData"
+            ],
+            "Effect": "Allow",
+            "Resource": "*"
+        }
+    ]
+})
+}
+
+resource "aws_iam_role_policy_attachment" "jenkins_master" {
+  policy_arn = aws_iam_policy.jenkins_master_policy.arn
+  role = aws_iam_role.jenkins_master.name
+}
+
+resource "aws_iam_instance_profile" "jenkins_master" {
+    name = "jenkins-master-profile"
+    role = aws_iam_role.jenkins_master.name
+}
+
 
 #Auto backup
 # resource "aws_iam_role" "backup_role" {

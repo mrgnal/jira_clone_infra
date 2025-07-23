@@ -6,3 +6,4 @@ backend*.conf
 *.tfstate*
 .terraform*
 zap_report
+*.pem

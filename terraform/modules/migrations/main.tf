@@ -14,7 +14,7 @@ resource "aws_lambda_function" "this" {
 
   environment {
     variables = {
-      DATABASE_URL = var.db_url
+      PARAM_NAME = var.param_name
     }
   }
 }

@@ -24,7 +24,7 @@ variable "subnet_ids" {
 #   type = list(string)
 # }
 
-variable "db_url" {
+variable "param_name" {
   type = string
 }
 

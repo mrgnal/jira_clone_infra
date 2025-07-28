@@ -2,14 +2,14 @@ module "migrations" {
   source = "../../modules/migrations"
   
   name = "jira-migrations"
-  image_uri ="${data.terraform_remote_state.global.outputs.ecr_migrate_url}:latest"
+  image_uri ="${data.terraform_remote_state.global.outputs.ecr_migrate_url}:production"
 
   vpc_id = data.terraform_remote_state.global.outputs.network.vpc_id
   subnets_cidr = data.terraform_remote_state.global.outputs.network.private_subnets_cidr
   subnet_ids = data.terraform_remote_state.global.outputs.network.private_subnets_ids
   # security_group_ids = [data.terraform_remote_state.global.outputs.network.ecs_sg_id]
 
-  db_url = aws_ssm_parameter.db_url.value
+  param_name = "/staging/db_url"
   
   role_name = "migrationRole"
     policies = [

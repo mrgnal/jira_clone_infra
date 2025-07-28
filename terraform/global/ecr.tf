@@ -10,11 +10,37 @@ module "app_ecr" {
   "rules": [
     {
       "rulePriority": 1,
-      "description": "Expire images above 2",
+      "description": "Keep last 3 prod images",
+      "selection": {
+        "tagStatus": "tagged",
+        "tagPrefixList": ["prod"],
+        "countType": "imageCountMoreThan",
+        "countNumber": 3
+      },
+      "action": {
+        "type": "expire"
+      }
+    },
+    {
+      "rulePriority": 2,
+      "description": "Keep last 2 dev images",
+      "selection": {
+        "tagStatus": "tagged",
+        "tagPrefixList": ["dev"],
+        "countType": "imageCountMoreThan",
+        "countNumber": 2
+      },
+      "action": {
+        "type": "expire"
+      }
+    },
+    {
+      "rulePriority": 10,
+      "description": "Remove any other images",
       "selection": {
         "tagStatus": "any",
         "countType": "imageCountMoreThan",
-        "countNumber": 2
+        "countNumber": 10
       },
       "action": {
         "type": "expire"
@@ -38,11 +64,37 @@ module "migrate_ecr" {
   "rules": [
     {
       "rulePriority": 1,
-      "description": "Expire images above 2",
+      "description": "Keep last 3 prod images",
+      "selection": {
+        "tagStatus": "tagged",
+        "tagPrefixList": ["prod"],
+        "countType": "imageCountMoreThan",
+        "countNumber": 3
+      },
+      "action": {
+        "type": "expire"
+      }
+    },
+    {
+      "rulePriority": 2,
+      "description": "Keep last 2 dev images",
+      "selection": {
+        "tagStatus": "tagged",
+        "tagPrefixList": ["dev"],
+        "countType": "imageCountMoreThan",
+        "countNumber": 2
+      },
+      "action": {
+        "type": "expire"
+      }
+    },
+    {
+      "rulePriority": 10,
+      "description": "Remove any other images",
       "selection": {
         "tagStatus": "any",
         "countType": "imageCountMoreThan",
-        "countNumber": 2
+        "countNumber": 10
       },
       "action": {
         "type": "expire"

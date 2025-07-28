@@ -41,7 +41,22 @@ resource "aws_iam_policy" "jenkins_agent" {
           module.app_ecr.repository_arn,
           module.migrate_ecr.repository_arn
         ]
-      }
+      },
+      {
+        Effect   = "Allow"
+        Action   = [
+          "ecs:UpdateService"
+        ]
+        Resource = "*"
+      },
+      {
+      "Effect": "Allow",
+      "Action": [
+        "lambda:UpdateFunctionCode",
+        "lambda:GetFunction"
+      ],
+      "Resource": "*"
+    },
     ]
   })
 }

@@ -10,15 +10,15 @@ module "app" {
   #ALB
   alb_name = "jira-alb"
   # alb_sg  = [data.terraform_remote_state.staging_global.outputs.network.alb_sg_id]
-  alb_subnets = data.terraform_remote_state.staging_global.outputs.network.public_subnets_ids
-  vpc_id = data.terraform_remote_state.staging_global.outputs.network.vpc_id
+  alb_subnets = data.terraform_remote_state.global.outputs.network.public_subnets_ids
+  vpc_id = data.terraform_remote_state.global.outputs.network.vpc_id
   
   #Cluster
   cluster_name = "jira-cluster"
 
   #Service
   service_name     = "jira-service"
-  ecs_subnets =  data.terraform_remote_state.staging_global.outputs.network.private_subnets_ids
+  ecs_subnets =  data.terraform_remote_state.global.outputs.network.private_subnets_ids
   # ecs_sg  = [data.terraform_remote_state.staging_global.outputs.network.ecs_sg_id]
   container_name   = "jira"
   port = 3000
@@ -31,7 +31,7 @@ module "app" {
   container_definitions = jsonencode([
   {
       name             = var.container_name
-      image            = "${data.terraform_remote_state.global.outputs.ecr_app_url}:latest"
+      image            = "${data.terraform_remote_state.global.outputs.ecr_app_url}:production"
       essential        = true
 
       portMappings = [
@@ -51,8 +51,8 @@ module "app" {
 
       secrets = [
         { name = "DATABASE_URL",        valueFrom = data.terraform_remote_state.staging_global.outputs.ssm_db },
-        { name = "CLERK_PUBLISHABLE",   valueFrom = aws_ssm_parameter.clerk_public.arn },
-        { name = "CLERK_SECRET",        valueFrom = aws_ssm_parameter.clerk_private.arn },
+        { name = "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY",   valueFrom = aws_ssm_parameter.clerk_public.arn },
+        { name = "CLERK_SECRET_KEY",        valueFrom = aws_ssm_parameter.clerk_private.arn },
         { name = "UPSTASH_REDIS_REST_URL",   valueFrom = aws_ssm_parameter.upstash_url.arn },
         { name = "UPSTASH_REDIS_REST_TOKEN", valueFrom = aws_ssm_parameter.upstash_token.arn }
       ]
@@ -133,7 +133,7 @@ module "app" {
   # endpoint_sg = [data.terraform_remote_state.staging_global.outputs.network.endpoint_sg_id]
 
   #NAT
-  private_rt = data.terraform_remote_state.staging_global.outputs.network.private_rt
+  private_rt = data.terraform_remote_state.global.outputs.network.private_rt
 
   # DNS
   enable_ssl = true

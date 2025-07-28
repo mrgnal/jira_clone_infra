@@ -24,23 +24,68 @@ openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
 
 #NGINX config
 cat <<EOF > /etc/nginx/sites-available/jenkins
+upstream jenkins {
+  keepalive 32; # keepalive connections
+  server 127.0.0.1:8080; # jenkins ip and port
+}
+
+map $http_upgrade $connection_upgrade {
+  default upgrade;
+  '' close;
+}
+
 server {
-    listen 443 ssl;
-    server_name jenkins.local;
-    access_log  /var/log/nginx/jenkins.access.log;
-   error_log   /var/log/nginx/jenkins.error.log;
+  listen          443 ssl;       
+  server_name     jenkins.clonejira.pp.ua;  
 
-    ssl_certificate /etc/nginx/ssl/jenkins.crt;
-    ssl_certificate_key /etc/nginx/ssl/jenkins.key;
+  root            /var/run/jenkins/war/;
 
-    location / {
-        proxy_pass http://localhost:8080;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_redirect http://localhost:8080 https://$host/;
-   }
+  access_log      /var/log/nginx/jenkins.access.log;
+  error_log       /var/log/nginx/jenkins.error.log;
+  ssl_certificate /etc/nginx/ssl/jenkins.crt;
+  ssl_certificate_key /etc/nginx/ssl/jenkins.key;
+
+  # pass through headers from Jenkins that Nginx considers invalid
+  ignore_invalid_headers off;
+
+  location ~ "^\/static\/[0-9a-fA-F]{8}\/(.*)$" {
+    rewrite "^\/static\/[0-9a-fA-F]{8}\/(.*)" /$1 last;
+  }
+
+  location /userContent {
+    root /var/lib/jenkins/;
+    if (!-f $request_filename){
+      rewrite (.*) /$1 last;
+      break;
+    }
+    sendfile on;
+  }
+
+  location / {
+      sendfile off;
+      proxy_pass         http://jenkins;
+      proxy_redirect     default;
+      proxy_http_version 1.1;
+
+      # Required for Jenkins websocket agents
+      proxy_set_header   Connection        $connection_upgrade;
+      proxy_set_header   Upgrade           $http_upgrade;
+
+      proxy_set_header   Host              $http_host;
+      proxy_set_header   X-Real-IP         $remote_addr;
+      proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+      proxy_set_header   X-Forwarded-Proto $scheme;
+      proxy_max_temp_file_size 0;
+
+      #this is the maximum upload size
+      client_max_body_size       10m;
+      client_body_buffer_size    128k;
+
+      proxy_connect_timeout      90;
+      proxy_send_timeout         90;
+      proxy_read_timeout         90;
+      proxy_request_buffering    off; 
+  }
 }
 EOF
 

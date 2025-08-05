@@ -8,6 +8,11 @@ x-app-base: &app-base
     CLERK_SECRET_KEY: ${CLERK_SECRET_KEY}
     UPSTASH_REDIS_REST_URL: "http://redis_proxy:8000"
     UPSTASH_REDIS_REST_TOKEN: ${UPSTASH_REDIS_REST_TOKEN}
+    SPLUNK_ACCESS_TOKEN: ${SPLUNK_ACCESS_TOKEN}
+    SPLUNK_API_URL: ${SPLUNK_API_URL}
+    SPLUNK_INGRES_URL: ${SPLUNK_INGRES_URL}
+    SPLUNK_HEC_URL: ${SPLUNK_HEC_URL}
+    SPLUNK_HEC_TOKEN: ${SPLUNK_HEC_TOKEN}
   depends_on:
     jira_db:
       condition: service_healthy
@@ -113,8 +118,8 @@ services:
       DB_PASSWORD: ${DATABASE_PASSWORD}
       DB_NAME: ${DATABASE_NAME}
       REDIS_ENDPOINT: redis:6379
-      SPLUNK_HEC_TOKEN: ${SPLUNK_HEC_TOKEN}
-      SPLUNK_HEC_URL: ${SPLUNK_HEC_URL}
+      SPLUNK_HEC_TOKEN: af22e2eb-80b7-4b6a-b369-5ad7c4653095
+      SPLUNK_HEC_URL: https://prd-p-e77pr.splunkcloud.com:8088
       NGINX_STATUS: nginx:8080
     volumes:
       - ./otel/otel-conf.yml:/etc/otel/config.yml:ro

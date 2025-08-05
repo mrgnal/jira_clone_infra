@@ -122,8 +122,8 @@ exporters:
     index: docker_metrics
     source: "otel"
     sourcetype: "otel"
-    tls:
-      insecure_skip_verify: true
+    # tls:
+    #   insecure_skip_verify: true
   
   splunk_hec/logs:
     token: "${SPLUNK_HEC_TOKEN}"
@@ -131,8 +131,8 @@ exporters:
     index: docker_logs
     source: "otel"
     sourcetype: "otel"
-    tls:
-      insecure_skip_verify: true
+    # tls:
+    #   insecure_skip_verify: true
     
   splunk_hec/traces:
     token: "${SPLUNK_HEC_TOKEN}"
@@ -140,8 +140,7 @@ exporters:
     index: docker_traces
     source: "otel"
     sourcetype: "otel"
-    tls:
-      insecure_skip_verify: true
+
   
   
 service:

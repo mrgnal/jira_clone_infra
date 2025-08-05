@@ -20,10 +20,12 @@ variable "backend_bucket_name" {
 #APIs for app
 variable "clerk_public" {
   type = string
+  sensitive = true
 }
 
 variable "clerk_private" {
   type = string
+  sensitive = true
 }
 
 variable "upstash_url" {
@@ -32,6 +34,7 @@ variable "upstash_url" {
 
 variable "upstash_token" {
   type = string
+  sensitive = true
 }
 
 variable "container_name" {
@@ -40,4 +43,27 @@ variable "container_name" {
 
 variable "domain_name" {
   type = string
+}
+
+#Splunk
+variable "splunk_hec_url" {
+  type = string
+}
+
+variable "splunk_hec_token" {
+  type = string  
+  sensitive = true
+}
+
+variable "splunk_api_url" {
+  type = string
+}
+
+variable "splunk_ingres_url" {
+  type = string
+}
+
+variable "splunk_access_token" {
+  type = string
+  sensitive = true
 }

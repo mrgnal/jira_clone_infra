@@ -9,7 +9,6 @@ module "app" {
   region = var.region
   #ALB
   alb_name = "jira-alb"
-  # alb_sg  = [data.terraform_remote_state.staging_global.outputs.network.alb_sg_id]
   alb_subnets = data.terraform_remote_state.global.outputs.network.public_subnets_ids
   vpc_id = data.terraform_remote_state.global.outputs.network.vpc_id
   
@@ -19,12 +18,10 @@ module "app" {
   #Service
   service_name     = "jira-service"
   ecs_subnets =  data.terraform_remote_state.global.outputs.network.private_subnets_ids
-  # ecs_sg  = [data.terraform_remote_state.staging_global.outputs.network.ecs_sg_id]
   container_name   = "jira"
   port = 3000
-  
-  # ecs_subnets =  data.terraform_remote_state.staging_global.outputs.network.public_subnets_ids
-  # assign_public_ip = true
+  min_capacity = 2
+
   
   #Task definition
   family_name = "jira-task"
@@ -48,13 +45,28 @@ module "app" {
           awslogs-stream-prefix = var.container_name
         }
       }
+      # logConfiguration = {
+      #   logDriver = "splunk"
+      #   options = {
+      #     splunk-url = var.splunk_hec_url
+      #     splunk-token = var.splunk_hec_token
+      #   }
+      # }
+
+      environment = [
+        { name = "SPLUNK_HEC_URL", value = "https://prd-p-e77pr.splunkcloud.com:8088"},
+        { name = "SPLUNK_API_URL", value = "https://api.eu1.signalfx.com"},
+        { name = "SPLUNK_INGRES_URL", value = "https://ingest.eu1.signalfx.com" }
+      ]
 
       secrets = [
         { name = "DATABASE_URL",        valueFrom = data.terraform_remote_state.staging_global.outputs.ssm_db },
         { name = "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY",   valueFrom = aws_ssm_parameter.clerk_public.arn },
         { name = "CLERK_SECRET_KEY",        valueFrom = aws_ssm_parameter.clerk_private.arn },
         { name = "UPSTASH_REDIS_REST_URL",   valueFrom = aws_ssm_parameter.upstash_url.arn },
-        { name = "UPSTASH_REDIS_REST_TOKEN", valueFrom = aws_ssm_parameter.upstash_token.arn }
+        { name = "UPSTASH_REDIS_REST_TOKEN", valueFrom = aws_ssm_parameter.upstash_token.arn },
+        { name = "SPLUNK_HEC_TOKEN", valueFrom = aws_ssm_parameter.splunk_hec_token.arn },
+        { name = "SPLUNK_ACCESS_TOKEN", valueFrom = aws_ssm_parameter.splunk_access_token.arn}
       ]
     }
   ])
@@ -96,6 +108,8 @@ module "app" {
               aws_ssm_parameter.clerk_private.arn,
               aws_ssm_parameter.upstash_token.arn,
               aws_ssm_parameter.upstash_url.arn,
+              aws_ssm_parameter.splunk_hec_token.arn,
+              aws_ssm_parameter.splunk_access_token.arn,
               data.terraform_remote_state.staging_global.outputs.ssm_db
             ]
           }
@@ -126,11 +140,6 @@ module "app" {
       })
     }
   ]
-
-  #Endpoints
-  # private_rt = [data.terraform_remote_state.staging_global.outputs.network.private_rt]
-  # private_rt = [data.terraform_remote_state.staging_global.outputs.network.public_rt]
-  # endpoint_sg = [data.terraform_remote_state.staging_global.outputs.network.endpoint_sg_id]
 
   #NAT
   private_rt = data.terraform_remote_state.global.outputs.network.private_rt

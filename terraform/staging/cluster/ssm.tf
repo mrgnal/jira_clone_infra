@@ -21,3 +21,15 @@ resource "aws_ssm_parameter" "upstash_token" {
   type  = "String"
   value = var.upstash_token
 }
+
+resource "aws_ssm_parameter" "splunk_access_token" {
+  name = "/staging/splunk_access_token"
+  type = "String"
+  value = var.splunk_access_token
+}
+
+resource "aws_ssm_parameter" "splunk_hec_token" {
+  name = "/staging/splunk_hec_token"
+  type = "String"
+  value = var.splunk_hec_token
+}

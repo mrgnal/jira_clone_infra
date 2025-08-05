@@ -25,3 +25,13 @@ output "jenkins_ip" {
 output "agent_role" {
   value = aws_iam_instance_profile.jenkins_agent.arn
 }
+
+#Splunk user
+output "splunk_access_key_id" {
+  value = aws_iam_access_key.splunk_user_key.id
+}
+
+output "splunk_secret_access_key" {
+  value     = aws_iam_access_key.splunk_user_key.secret
+  sensitive = true
+}
